@@ -1,23 +1,19 @@
 import input_checker
 
 def process_list(numbers: list):
-    # Генератор для нахождения индексов ненулевых элементов
     def non_zero_indices():
         for i, num in enumerate(numbers):
             if num != 0:
                 yield i
 
-    # Находим индекс максимального значения
     max_value = max(numbers)
     max_index = numbers.index(max_value)
     print(f"Index of the greatest number: {max_index}")
 
-    # Используем генератор для получения первых двух ненулевых индексов
     nz_indices = non_zero_indices()
     first_non_zero_index = next(nz_indices, None)
     second_non_zero_index = next(nz_indices, None)
 
-    # Вычисляем произведение между двумя первыми ненулевыми элементами
     if first_non_zero_index is not None and second_non_zero_index is not None:
         product = 1
         for num in numbers[first_non_zero_index + 1:second_non_zero_index]:
