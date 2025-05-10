@@ -1,0 +1,19 @@
+Hello world! How are you? Today is a wonderful day.
+The weather is lovely: the sun is shining, birds are singing...
+But suddenly, it started raining :(
+
+That’s how it always is! Sunshine, then rain :))
+
+List of MAC addresses:
+Valid: aE:dC:cA:56:76:54
+Invalid: 01:23:45:67:89:Az
+
+Words with repeated letters: coffee, terrace, gram, alley.
+
+Emoticons in the text: ;), :-((, :---], :[[[, ;-).
+
+Now let’s check words starting with consonants: rose, apple, house, hedgehog, street.
+
+Punctuation marks: , . ! ? : ;
+
+Lowercase words: "cat", "elephant", "ball".
