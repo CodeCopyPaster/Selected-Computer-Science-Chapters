@@ -1,0 +1,86 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Статистика товаров - Sweet Dreams{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Статистика товаров</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'shop:admin_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Вернуться к панели
+            </a>
+        </div>
+    </div>
+
+    <!-- Основные показатели -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ценовой диапазон</h5>
+                    <p class="mb-1">Минимальная цена: {{ stats.price_ranges.min_price|floatformat:2 }} ₽</p>
+                    <p class="mb-1">Максимальная цена: {{ stats.price_ranges.max_price|floatformat:2 }} ₽</p>
+                    <p class="mb-0">Средняя цена: {{ stats.price_ranges.avg_price|floatformat:2 }} ₽</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Распределение по категориям</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Категория</th>
+                                    <th>Количество товаров</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in stats.category_distribution %}
+                                <tr>
+                                    <td>{{ category.name }}</td>
+                                    <td>{{ category.products_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Топ продуктов -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Топ-10 самых продаваемых товаров</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Товар</th>
+                            <th>Категория</th>
+                            <th>Количество заказов</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in stats.top_products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.category.name }}</td>
+                            <td>{{ product.total_ordered }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

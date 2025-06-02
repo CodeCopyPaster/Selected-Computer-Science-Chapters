@@ -1,0 +1,151 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Список клиентов - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-0">Список клиентов</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'shop:employee_dashboard' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-tachometer-alt me-2"></i>Панель управления
+            </a>
+            <a href="{% url 'shop:logout' %}" class="btn btn-outline-danger">
+                <i class="fas fa-sign-out-alt me-2"></i>Выйти
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if customers %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Имя</th>
+                                <th>Email</th>
+                                <th>Телефон</th>
+                                <th>Дата регистрации</th>
+                                <th>Заказов</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                            <tr>
+                                <td>{{ customer.get_full_name|default:customer.username }}</td>
+                                <td>{{ customer.email }}</td>
+                                <td>{{ customer.customer.phone_number|default:"-" }}</td>
+                                <td>{{ customer.date_joined|date:"d.m.Y" }}</td>
+                                <td>{{ customer.orders.count }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            data-bs-toggle="modal" data-bs-target="#customerModal{{ customer.id }}">
+                                        <i class="fas fa-eye me-1"></i>Подробнее
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Нет зарегистрированных клиентов</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Модальные окна с информацией о клиентах -->
+{% for customer in customers %}
+<div class="modal fade" id="customerModal{{ customer.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Информация о клиенте</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Основная информация</h6>
+                        <p><strong>Имя:</strong> {{ customer.get_full_name|default:customer.username }}</p>
+                        <p><strong>Email:</strong> {{ customer.email }}</p>
+                        <p><strong>Телефон:</strong> {{ customer.customer.phone_number|default:"Не указан" }}</p>
+                        <p><strong>Адрес:</strong> {{ customer.customer.address|default:"Не указан" }}</p>
+                        <p><strong>Дата регистрации:</strong> {{ customer.date_joined|date:"d.m.Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Статистика заказов</h6>
+                        <p><strong>Всего заказов:</strong> {{ customer.orders.count }}</p>
+                        <p><strong>Последний заказ:</strong> 
+                            {% with last_order=customer.orders.last %}
+                            {% if last_order %}
+                                {{ last_order.order_date|date:"d.m.Y" }}
+                            {% else %}
+                                Нет заказов
+                            {% endif %}
+                            {% endwith %}
+                        </p>
+                    </div>
+                </div>
+                
+                <h6 class="mt-4">Последние заказы</h6>
+                {% with recent_orders=customer.orders.all|slice:":5" %}
+                {% if recent_orders %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Дата</th>
+                                    <th>Статус</th>
+                                    <th>Сумма</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td>#{{ order.id }}</td>
+                                    <td>{{ order.order_date|date:"d.m.Y" }}</td>
+                                    <td>
+                                        <span class="badge {% if order.status == 'delivered' %}bg-success{% elif order.status == 'cancelled' %}bg-danger{% else %}bg-primary{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ order.total_amount }} ₽</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">У клиента пока нет заказов</p>
+                {% endif %}
+                {% endwith %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %} 

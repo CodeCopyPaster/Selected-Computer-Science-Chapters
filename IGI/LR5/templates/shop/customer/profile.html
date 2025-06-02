@@ -1,0 +1,165 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Личный кабинет - Sweet Dreams{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-section {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .order-card {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: transform 0.2s;
+    }
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .promo-card {
+        background: linear-gradient(45deg, #fce4ec, #f8bbd0);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: transform 0.2s;
+    }
+    .promo-card:hover {
+        transform: translateY(-5px);
+    }
+    .pickup-point-card {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <!-- Personal Information -->
+        <div class="profile-section">
+            <h3>Личная информация</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Телефон:</strong> {{ user.phone|default:"Не указан" }}</p>
+                    <p><strong>Адрес:</strong> {{ user.address|default:"Не указан" }}</p>
+                </div>
+            </div>
+            <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                Редактировать профиль
+            </button>
+        </div>
+
+        <!-- Order History -->
+        <div class="profile-section">
+            <h3>История заказов</h3>
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Заказ #{{ order.id }}</h5>
+                    <span class="badge bg-{% if order.status == 'delivered' %}success
+                        {% elif order.status == 'pending' %}warning
+                        {% elif order.status == 'cancelled' %}danger
+                        {% else %}info{% endif %}">
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+                <p><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                <p><strong>Сумма:</strong> {{ order.total_amount }} руб.</p>
+                <p><strong>Пункт выдачи:</strong> {{ order.pickup_point.address }}</p>
+                
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" 
+                            data-bs-target="#orderItems{{ order.id }}">
+                        Показать состав заказа
+                    </button>
+                </div>
+                
+                <div class="collapse mt-2" id="orderItems{{ order.id }}">
+                    <ul class="list-unstyled">
+                        {% for item in order.items.all %}
+                        <li>{{ item.product.name }} x {{ item.quantity }} - {{ item.price }} руб.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                У вас пока нет заказов.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Active Promotions -->
+        <div class="profile-section">
+            <h3>Активные промокоды</h3>
+            {% for promo in active_promos %}
+            <div class="promo-card">
+                <h5>{{ promo.code }}</h5>
+                <p class="mb-1">Скидка: {{ promo.discount_percent }}%</p>
+                <small>Действует до: {{ promo.valid_to|date:"d.m.Y" }}</small>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                Нет активных промокодов.
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pickup Points -->
+        <div class="profile-section">
+            <h3>Пункты самовывоза</h3>
+            {% for point in pickup_points %}
+            <div class="pickup-point-card">
+                <h5>{{ point.address }}</h5>
+                <p class="mb-1">Телефон: {{ point.phone }}</p>
+                <p class="mb-0">Время работы: {{ point.working_hours }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Редактировать профиль</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'shop:profile_update' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Телефон</label>
+                        <input type="tel" name="phone" class="form-control" value="{{ user.phone }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Адрес</label>
+                        <textarea name="address" class="form-control" rows="3">{{ user.address }}</textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,75 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}О нас - Sweet Dreams{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Добро пожаловать в Sweet Dreams</h1>
+        <p>Ваша любимая кондитерская с 2025 года</p>
+    </div>
+
+    <div class="content">
+        <h2>О нас</h2>
+        <p>Sweet Dreams - это уютная кондитерская, где каждый десерт создается с любовью и вниманием к деталям. Мы гордимся тем, что используем только натуральные ингредиенты высочайшего качества для создания наших кулинарных шедевров.</p>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>Свежая выпечка</h3>
+                <p>Каждое утро мы готовим свежую выпечку, чтобы порадовать наших клиентов ароматными круассанами, пирожными и тортами.</p>
+            </div>
+            <div class="feature">
+                <h3>Индивидуальный подход</h3>
+                <p>Мы создаем торты на заказ по вашим пожеланиям для любого праздника или особого случая.</p>
+            </div>
+            <div class="feature">
+                <h3>Качество</h3>
+                <p>Используем только натуральные ингредиенты и проверенные рецепты для создания наших десертов.</p>
+            </div>
+        </div>
+
+        {% if company_info %}
+        <div class="contact-info">
+            <h3>Контактная информация</h3>
+            <p>{{ company_info.address }}</p>
+            <p>Телефон: {{ company_info.phone }}</p>
+            <p>Email: {{ company_info.email }}</p>
+            <p>Основано в {{ company_info.founded_year }} году</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .header {
+        text-align: center;
+        color: #221d1e;
+        margin-bottom: 2rem;
+    }
+    .content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    .feature {
+        text-align: center;
+        padding: 1rem;
+    }
+    .contact-info {
+        text-align: center;
+        margin-top: 2rem;
+        padding: 1rem;
+        background-color: #d8d4d6;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+{% endblock %} 

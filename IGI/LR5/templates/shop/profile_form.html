@@ -1,0 +1,60 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Заполнение профиля - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h4 class="mb-0">Заполнение профиля</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label">Номер телефона</label>
+                            <input type="text" class="form-control" id="phone_number" name="phone_number" 
+                                   placeholder="+375 (29) XXX-XX-XX" required
+                                   pattern="^\+375 \((?:29|33|44|25)\) [0-9]{3}-[0-9]{2}-[0-9]{2}$">
+                            <div class="form-text">Формат: +375 (29) XXX-XX-XX</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="birth_date" class="form-label">Дата рождения</label>
+                            <input type="date" class="form-control" id="birth_date" name="birth_date" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Адрес доставки</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                            <div class="form-text">Укажите полный адрес для доставки заказов</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Сохранить
+                            </button>
+                            <a href="{% url 'shop:profile' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

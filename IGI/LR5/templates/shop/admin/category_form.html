@@ -1,0 +1,46 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}{% if category %}Редактирование{% else %}Добавление{% endif %} категории - Sweet Dreams{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{% if category %}Редактирование{% else %}Добавление{% endif %} категории</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'shop:admin_category_list' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>К списку категорий
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">Название категории</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ category.name|default:'' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Описание</label>
+                    <textarea class="form-control" id="description" name="description" rows="3">{{ category.description|default:'' }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="image" class="form-label">Изображение</label>
+                    {% if category and category.image %}
+                    <div class="mb-2">
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-thumbnail" style="max-height: 200px;">
+                    </div>
+                    {% endif %}
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Сохранить
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

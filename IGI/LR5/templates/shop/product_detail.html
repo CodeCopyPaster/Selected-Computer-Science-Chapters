@@ -1,0 +1,121 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}{{ product.name }} - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
+            {% else %}
+                <div class="text-center p-5 bg-light rounded">
+                    <i class="fas fa-image fa-4x text-muted"></i>
+                    <p class="mt-2 text-muted">Изображение отсутствует</p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ product.name }}</h1>
+            <p class="lead">{{ product.description }}</p>
+            <div class="mb-3">
+                <h4 class="text-primary">{{ product.price }} руб.</h4>
+            </div>
+            <div class="mb-3">
+                <p><strong>Категория:</strong> {{ product.category.name }}</p>
+                <p><strong>Производитель:</strong> {{ product.manufacturer.name }}</p>
+            </div>
+            {% if product.available %}
+                <form action="{% url 'shop:cart_add' product.id %}" method="post" class="mb-3">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="max-width: 100px;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-cart-plus"></i> Добавить в корзину
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="alert alert-warning">
+                    Товар временно недоступен
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>Отзывы</h3>
+            {% if user.is_authenticated %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Оставить отзыв</h5>
+                        <form action="{% url 'shop:add_review' product.id %}" method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="rating" class="form-label">Оценка</label>
+                                <select name="rating" id="rating" class="form-select" required>
+                                    <option value="">Выберите оценку</option>
+                                    <option value="5">5 - Отлично</option>
+                                    <option value="4">4 - Хорошо</option>
+                                    <option value="3">3 - Нормально</option>
+                                    <option value="2">2 - Плохо</option>
+                                    <option value="1">1 - Очень плохо</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="comment" class="form-label">Комментарий</label>
+                                <textarea name="comment" id="comment" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Отправить отзыв</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <p>Чтобы оставить отзыв, пожалуйста, <a href="{% url 'shop:login' %}">войдите</a> в систему.</p>
+                </div>
+            {% endif %}
+
+            <div class="reviews">
+                {% if reviews %}
+                    <div class="mb-4">
+                        <h4>Средняя оценка: 
+                            <span class="text-warning">
+                                {% if avg_rating %}
+                                    {{ avg_rating|floatformat:1 }} из 5
+                                    ({{ reviews|length }} отзыв{{ reviews|length|pluralize:"ов" }})
+                                {% else %}
+                                    Нет оценок
+                                {% endif %}
+                            </span>
+                        </h4>
+                    </div>
+                    {% for review in reviews %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="card-title">{{ review.customer.user.get_full_name|default:review.customer.user.username }}</h5>
+                                    <div class="text-warning">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= review.rating %}
+                                                ★
+                                            {% else %}
+                                                ☆
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <p class="card-text">{{ review.comment }}</p>
+                                <p class="card-text"><small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small></p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Пока нет отзывов об этом товаре.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,214 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Отчеты о продажах - Sweet Dreams{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Отчеты о продажах</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'shop:admin_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Вернуться к панели
+            </a>
+        </div>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="period" class="form-label">Период</label>
+                    <select class="form-select" id="period" name="period">
+                        <option value="week" {% if period == 'week' %}selected{% endif %}>Неделя</option>
+                        <option value="month" {% if period == 'month' %}selected{% endif %}>Месяц</option>
+                        <option value="year" {% if period == 'year' %}selected{% endif %}>Год</option>
+                        <option value="custom" {% if period == 'custom' %}selected{% endif %}>Произвольный период</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="date_from" class="form-label">Дата от</label>
+                    <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="date_to" class="form-label">Дата до</label>
+                    <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Применить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Основные показатели -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Общая сумма продаж</h5>
+                    <h3 class="mb-0">{{ total_sales|floatformat:2 }} ₽</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Количество заказов</h5>
+                    <h3 class="mb-0">{{ total_orders }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Средний чек</h5>
+                    <h3 class="mb-0">{{ average_order|floatformat:2 }} ₽</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Активных клиентов</h5>
+                    <h3 class="mb-0">{{ active_customers }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Графики -->
+    <div class="row">
+        <!-- График продаж по времени -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Динамика продаж</h5>
+                </div>
+                <div class="card-body">
+                    {% if charts.sales_over_time %}
+                    <img src="data:image/png;base64,{{ charts.sales_over_time }}" class="img-fluid" alt="График продаж">
+                    {% else %}
+                    <p class="text-center text-muted">Нет данных для отображения</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- График продаж по категориям -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Продажи по категориям</h5>
+                </div>
+                <div class="card-body">
+                    {% if charts.sales_by_category %}
+                    <img src="data:image/png;base64,{{ charts.sales_by_category }}" class="img-fluid" alt="Продажи по категориям">
+                    {% else %}
+                    <p class="text-center text-muted">Нет данных для отображения</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Топ продуктов -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Топ-10 продуктов</h5>
+                </div>
+                <div class="card-body">
+                    {% if charts.top_products %}
+                    <img src="data:image/png;base64,{{ charts.top_products }}" class="img-fluid" alt="Топ продуктов">
+                    {% else %}
+                    <p class="text-center text-muted">Нет данных для отображения</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблицы с данными -->
+    <div class="row">
+        <!-- Продажи по категориям -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Продажи по категориям</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Категория</th>
+                                    <th>Сумма продаж</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in sales_by_category %}
+                                <tr>
+                                    <td>{{ category.name }}</td>
+                                    <td>{{ category.total_sales|floatformat:2 }} ₽</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Топ продуктов -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Топ-10 продуктов по продажам</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Продукт</th>
+                                    <th>Сумма продаж</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in top_products %}
+                                <tr>
+                                    <td>{{ product.name }}</td>
+                                    <td>{{ product.total_sales|floatformat:2 }} ₽</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Управление фильтрами дат
+    document.getElementById('period').addEventListener('change', function() {
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        if (this.value === 'custom') {
+            dateInputs.forEach(input => input.removeAttribute('disabled'));
+        } else {
+            dateInputs.forEach(input => input.setAttribute('disabled', 'disabled'));
+        }
+    });
+
+    // Инициализация при загрузке страницы
+    if (document.getElementById('period').value !== 'custom') {
+        document.querySelectorAll('input[type="date"]').forEach(input => input.setAttribute('disabled', 'disabled'));
+    }
+</script>
+{% endblock %}
+
+{% endblock %} 

@@ -1,0 +1,164 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Отчет о продажах - Sweet Dreams{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Отчет о продажах</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'shop:admin_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Вернуться к панели
+            </a>
+        </div>
+    </div>
+
+    <!-- Фильтры по датам -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="start_date" class="form-label">Начальная дата</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="end_date" class="form-label">Конечная дата</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Применить фильтр</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Основные показатели -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Общая сумма продаж</h5>
+                    <h3 class="mb-0">{{ stats.total_sales|floatformat:2 }} ₽</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Количество заказов</h5>
+                    <h3 class="mb-0">{{ stats.total_orders }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Средний чек</h5>
+                    <h3 class="mb-0">{{ stats.average_order|floatformat:2 }} ₽</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Графики -->
+    <div class="row mb-4">
+        <!-- График продаж по месяцам -->
+        {% if charts.monthly_sales %}
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Динамика продаж по месяцам</h5>
+                </div>
+                <div class="card-body">
+                    <img src="data:image/png;base64,{{ charts.monthly_sales }}" class="img-fluid" alt="График продаж по месяцам">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Круговая диаграмма категорий -->
+        {% if charts.category_sales %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Распределение продаж по категориям</h5>
+                </div>
+                <div class="card-body">
+                    <img src="data:image/png;base64,{{ charts.category_sales }}" class="img-fluid" alt="Распределение по категориям">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- График топ-10 продуктов -->
+        {% if charts.top_products %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Топ-10 продуктов по продажам</h5>
+                </div>
+                <div class="card-body">
+                    <img src="data:image/png;base64,{{ charts.top_products }}" class="img-fluid" alt="Топ-10 продуктов">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Таблица продаж по категориям -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Продажи по категориям</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Категория</th>
+                            <th>Сумма продаж</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in stats.sales_by_category %}
+                        <tr>
+                            <td>{{ category.name }}</td>
+                            <td>{{ category.total_sales|default:"0.00"|floatformat:2 }} ₽</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица продаж по производителям -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Продажи по производителям</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Производитель</th>
+                            <th>Сумма продаж</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for manufacturer in stats.sales_by_manufacturer %}
+                        <tr>
+                            <td>{{ manufacturer.name }}</td>
+                            <td>{{ manufacturer.total_sales|default:"0.00"|floatformat:2 }} ₽</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

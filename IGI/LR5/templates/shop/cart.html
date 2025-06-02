@@ -1,0 +1,147 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Корзина - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Корзина</h1>
+
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if cart.get_total_items > 0 %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Товар</th>
+                                    <th>Количество</th>
+                                    <th>Цена</th>
+                                    <th>Сумма</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'shop:product_detail' item.product.id %}" class="text-decoration-none">
+                                            {{ item.product.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'shop:cart_update' item.product.id %}" method="post" class="d-flex align-items-center">
+                                            {% csrf_token %}
+                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99" class="form-control form-control-sm" style="width: 70px;">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary ms-2">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td>{{ item.price }} ₽</td>
+                                    <td>{{ item.total_price }} ₽</td>
+                                    <td>
+                                        <form action="{% url 'shop:cart_remove' item.product.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Итого</h5>
+                    
+                    <div class="mb-3">
+                        <p class="mb-1">Сумма товаров: <strong>{{ cart.get_total_price }} ₽</strong></p>
+                        {% if request.session.promo_code %}
+                            {% with promo=cart.get_promo_discount %}
+                                {% if promo %}
+                                    <p class="mb-1 text-success">
+                                        <i class="fas fa-tag me-1"></i>
+                                        Промокод {{ promo.code }} ({{ promo.discount_percent }}%)
+                                        <small>
+                                            <a href="#" onclick="removePromo(event)" class="text-danger ms-2">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </small>
+                                    </p>
+                                    <p class="mb-1">Скидка: <strong class="text-success">-{{ promo.discount_amount }} ₽</strong></p>
+                                    <p class="mb-3">Итого со скидкой: <strong>{{ promo.final_price }} ₽</strong></p>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    </div>
+                    
+                    <form action="{% url 'shop:apply_promo' %}" method="post" class="mb-3">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" name="promo_code" class="form-control" placeholder="Промокод">
+                            <button type="submit" class="btn btn-outline-secondary">
+                                <i class="fas fa-tag me-1"></i>Применить
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <form action="{% url 'shop:place_order' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>Оформить заказ
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-shopping-cart fa-3x mb-3 text-muted"></i>
+        <h3>Ваша корзина пуста</h3>
+        <p class="text-muted">Добавьте товары из каталога</p>
+        <a href="{% url 'shop:product_list' %}" class="btn btn-primary">
+            <i class="fas fa-store me-2"></i>Перейти в каталог
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function removePromo(event) {
+    event.preventDefault();
+    fetch("{% url 'shop:apply_promo' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: 'remove_promo=1'
+    }).then(() => {
+        window.location.reload();
+    });
+}
+</script>
+{% endblock %} 

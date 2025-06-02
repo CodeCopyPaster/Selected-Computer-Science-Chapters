@@ -1,0 +1,245 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Панель управления - Sweet Dreams{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Панель управления администратора</h1>
+
+    <!-- Основные показатели -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Продажи сегодня</h5>
+                    <h3 class="mb-0">{{ today_sales|floatformat:2 }} ₽</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Новые заказы</h5>
+                    <h3 class="mb-0">{{ new_orders }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Активные клиенты</h5>
+                    <h3 class="mb-0">{{ active_customers }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Активные акции</h5>
+                    <h3 class="mb-0">{{ active_promos }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Быстрые действия -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Быстрые действия</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{% url 'shop:admin_product_add' %}" class="btn btn-primary w-100">
+                                <i class="fas fa-plus me-2"></i>Добавить товар
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'shop:admin_category_add' %}" class="btn btn-success w-100">
+                                <i class="fas fa-folder-plus me-2"></i>Добавить категорию
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'shop:admin_manufacturer_add' %}" class="btn btn-info w-100">
+                                <i class="fas fa-industry me-2"></i>Добавить производителя
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'shop:admin_promo_add' %}" class="btn btn-warning w-100">
+                                <i class="fas fa-tag me-2"></i>Создать акцию
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Управление каталогом -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Управление товарами</h5>
+                    <a href="{% url 'shop:admin_product_list' %}" class="btn btn-sm btn-outline-primary">
+                        Все товары
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'shop:admin_product_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Всего товаров
+                            <span class="badge bg-primary rounded-pill">{{ total_products }}</span>
+                        </a>
+                        <a href="{% url 'shop:admin_category_list' %}" class="list-group-item list-group-item-action">
+                            Управление категориями
+                        </a>
+                        <!-- <a href="{% url 'shop:admin_manufacturer_list' %}" class="list-group-item list-group-item-action">
+                            Управление производителями
+                        </a> -->
+                        <a href="{% url 'shop:admin_product_stats' %}" class="list-group-item list-group-item-action">
+                            Статистика продаж
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Управление заказами</h5>
+                    <a href="{% url 'shop:admin_order_list' %}" class="btn btn-sm btn-outline-primary">
+                        Все заказы
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'shop:admin_order_list' %}?status=new" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Новые заказы
+                            <span class="badge bg-danger rounded-pill">{{ new_orders }}</span>
+                        </a>
+                        <a href="{% url 'shop:admin_customer_list' %}" class="list-group-item list-group-item-action">
+                            Управление клиентами
+                        </a>
+                        <!-- <a href="{% url 'shop:admin_employee_list' %}" class="list-group-item list-group-item-action">
+                            Управление сотрудниками
+                        </a> -->
+                        <a href="{% url 'shop:admin_sales_stats' %}" class="list-group-item list-group-item-action">
+                            Отчеты о продажах
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Последние заказы -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Последние заказы</h5>
+            <a href="{% url 'shop:admin_order_list' %}" class="btn btn-sm btn-outline-primary">
+                Все заказы
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>№ заказа</th>
+                            <th>Клиент</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Сумма</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.customer.get_full_name|default:order.customer.username }}</td>
+                            <td>{{ order.order_date|date:"d.m.Y H:i" }}</td>
+                            <td>
+                                <span class="badge {% if order.status == 'delivered' %}bg-success{% elif order.status == 'cancelled' %}bg-danger{% elif order.status == 'processing' %}bg-info{% else %}bg-warning{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ order.total_amount|floatformat:2 }} ₽</td>
+                            <td>
+                                <a href="{% url 'shop:admin_order_detail' order.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Последние товары -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Последние товары</h5>
+            <a href="{% url 'shop:admin_product_list' %}" class="btn btn-sm btn-outline-primary">
+                Все товары
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Категория</th>
+                            <th>Цена</th>
+                            <th>В наличии</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in recent_products %}
+                        <tr>
+                            <td>#{{ product.id }}</td>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.category.name }}</td>
+                            <td>{{ product.price|floatformat:2 }} ₽</td>
+                            <td>
+                                <span class="badge {% if product.in_stock %}bg-success{% else %}bg-danger{% endif %}">
+                                    {% if product.in_stock %}Да{% else %}Нет{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'shop:product_detail' product.id %}" class="btn btn-sm btn-outline-primary" title="Просмотр">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'shop:admin_product_edit' product.id %}" class="btn btn-sm btn-outline-warning" title="Редактировать">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'shop:admin_product_delete' product.id %}" class="btn btn-sm btn-outline-danger" title="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этот товар?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Здесь можно добавить JavaScript для интерактивных графиков
+</script>
+{% endblock %} 

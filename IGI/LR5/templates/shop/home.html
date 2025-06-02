@@ -1,0 +1,151 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Главная - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="position-absolute top-0 end-0 p-3">
+    <div class="text-end">
+        <small class="text-muted">
+            <i class="fas fa-clock"></i>
+            Минск: {{ current_time|date:"H:i" }}
+        </small>
+    </div>
+</div>
+
+<div class="jumbotron text-center mb-4">
+    <h1 class="display-4">Добро пожаловать в нашу кондитерскую!</h1>
+    <p class="lead">Мы предлагаем широкий выбор свежих и вкусных кондитерских изделий</p>
+    <hr class="my-4">
+    <p>Изучите наш каталог и выберите что-нибудь вкусное для себя и своих близких</p>
+    <div class="mt-4">
+        <a class="btn btn-primary btn-lg me-2" href="{% url 'shop:product_list' %}" role="button">Перейти в каталог</a>
+        <a class="btn btn-outline-primary btn-lg" href="{% url 'shop:news_list' %}" role="button">Новости</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        {% if cat_fact %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="{{ cat_fact.icon }}"></i>
+                    Интересный факт о кошках
+                </h5>
+                <div class="fact-content">
+                    <p class="mb-2">{{ cat_fact.text }}</p>
+                    <small class="text-muted">Обновляется каждые 30 минут</small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        {% if currency_rates %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Курсы валют</h5>
+                <div class="row">
+                    <div class="col-4">
+                        <p class="mb-1">USD/BYN</p>
+                        <h4>{{ currency_rates.USD|floatformat:2 }}</h4>
+                    </div>
+                    <div class="col-4">
+                        <p class="mb-1">EUR/BYN</p>
+                        <h4>{{ currency_rates.EUR|floatformat:2 }}</h4>
+                    </div>
+                    <div class="col-4">
+                        <p class="mb-1">RUB/BYN</p>
+                        <h4>{{ currency_rates.RUB|floatformat:2 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if latest_news %}
+<section class="latest-news py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4">Последние новости</h2>
+        <div class="card">
+            {% if latest_news.image %}
+                <img src="{{ latest_news.image.url }}" class="card-img-top" alt="{{ latest_news.title }}">
+            {% endif %}
+            <div class="card-body">
+                <h3 class="card-title">{{ latest_news.title }}</h3>
+                <p class="card-text">{{ latest_news.content|truncatewords:50 }}</p>
+                <p class="text-muted">{{ latest_news.created_at|date:"d.m.Y" }}</p>
+                <div class="text-center">
+                    <a href="{% url 'shop:news_detail' latest_news.pk %}" class="btn btn-primary me-2">Читать далее</a>
+                    <a href="{% url 'shop:news_list' %}" class="btn btn-outline-primary">Все новости</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="categories py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Категории продукции</h2>
+        <div class="row">
+            {% for category in categories %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ category.name }}</h5>
+                        <p class="card-text">{{ category.description|truncatewords:20 }}</p>
+                        <a href="{% url 'shop:category_products' category.pk %}" class="btn btn-outline-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="products py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4">Новинки</h2>
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-3 mb-3">
+                <div class="card h-100">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description|truncatewords:15 }}</p>
+                        <p class="card-text">
+                            <strong>Цена: </strong>{{ product.price }} руб.
+                        </p>
+                        <a href="{% url 'shop:product_detail' product.pk %}" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-center">Пока нет доступных товаров.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if company_info %}
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">О нашей компании</h3>
+                <p class="card-text">{{ company_info.description|truncatewords:50 }}</p>
+                <a href="{% url 'shop:about' %}" class="btn btn-outline-primary">Узнать больше</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

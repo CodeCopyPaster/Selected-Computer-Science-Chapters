@@ -1,0 +1,84 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Управление сотрудниками - Sweet Dreams{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Управление сотрудниками</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'shop:admin_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Вернуться к панели
+            </a>
+        </div>
+    </div>
+
+    <!-- Кнопка добавления сотрудника -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{% url 'shop:admin_employee_add' %}" class="btn btn-primary">
+                <i class="fas fa-user-plus me-2"></i>Добавить сотрудника
+            </a>
+        </div>
+    </div>
+
+    <!-- Список сотрудников -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Email</th>
+                            <th>Должность</th>
+                            <th>Дата найма</th>
+                            <th>Обработано заказов</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                        <tr>
+                            <td>{{ employee.id }}</td>
+                            <td>{{ employee.get_full_name|default:employee.username }}</td>
+                            <td>{{ employee.email }}</td>
+                            <td>{{ employee.position|default:"Не указана" }}</td>
+                            <td>{{ employee.date_joined|date:"d.m.Y" }}</td>
+                            <td>{{ employee.orders_processed }}</td>
+                            <td>
+                                <span class="badge {% if employee.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ employee.is_active|yesno:"Активен,Заблокирован" }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'shop:admin_employee_edit' employee.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'shop:admin_employee_toggle_status' employee.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-{% if employee.is_active %}danger{% else %}success{% endif %}" 
+                                                title="{{ employee.is_active|yesno:'Заблокировать,Активировать' }}">
+                                            <i class="fas fa-{% if employee.is_active %}ban{% else %}check{% endif %}"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">Нет сотрудников</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center mb-4">
+    <h1 class="display-4">Добро пожаловать в нашу кондитерскую!</h1>
+    <p class="lead">Мы предлагаем широкий выбор свежих и вкусных кондитерских изделий</p>
+    <hr class="my-4">
+    <p>Изучите наш каталог и выберите что-нибудь вкусное для себя и своих близких</p>
+    <a class="btn btn-primary btn-lg" href="{% url 'shop:product_list' %}" role="button">Перейти в каталог</a>
+</div>
+
+{% if latest_news %}
+<section class="latest-news py-5 bg-light">
+    <div class="container">
+        <h2 class="mb-4">Последние новости</h2>
+        <div class="card">
+            {% if latest_news.image %}
+                <img src="{{ latest_news.image.url }}" class="card-img-top" alt="{{ latest_news.title }}">
+            {% endif %}
+            <div class="card-body">
+                <h3 class="card-title">{{ latest_news.title }}</h3>
+                <p class="card-text">{{ latest_news.content|truncatewords:50 }}</p>
+                <p class="text-muted">{{ latest_news.created_at|date:"d.m.Y" }}</p>
+                <a href="{% url 'shop:news_detail' latest_news.pk %}" class="btn btn-primary">Читать далее</a>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'shop:news_list' %}" class="btn btn-outline-primary">Все новости</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="featured-products py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Популярные товары</h2>
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+                            <p class="card-text"><strong>{{ product.price }} ₽</strong></p>
+                            <a href="{% url 'shop:product_detail' product.pk %}" class="btn btn-primary">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %} 

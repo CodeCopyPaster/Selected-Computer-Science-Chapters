@@ -1,0 +1,87 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Заказ #{{ order.id }} - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-4">Заказ #{{ order.id }}</h1>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Информация о заказе</h5>
+                    <p class="card-text">
+                        <strong>Дата заказа:</strong> {{ order.order_date|date:"d.m.Y H:i" }}<br>
+                        <strong>Статус:</strong> {{ order.get_status_display }}<br>
+                        <strong>Сумма заказа:</strong> {{ order.total_amount }} руб.
+                    </p>
+                    {% if order.delivery_date %}
+                        <p class="card-text">
+                            <strong>Дата доставки:</strong> {{ order.delivery_date|date:"d.m.Y H:i" }}
+                        </p>
+                    {% endif %}
+                    {% if order.pickup_point %}
+                        <p class="card-text">
+                            <strong>Пункт выдачи:</strong> {{ order.pickup_point.address }}
+                        </p>
+                    {% endif %}
+                    {% if order.promo %}
+                        <p class="card-text">
+                            <strong>Использованный промокод:</strong> {{ order.promo.code }}
+                            (скидка {{ order.promo.discount_percent }}%)
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h5 class="mb-3">Состав заказа</h5>
+            {% for item in order.orderitem_set.all %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                                {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-fluid rounded">
+                                {% else %}
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-10">
+                                <h6 class="card-title">{{ item.product.name }}</h6>
+                                <p class="card-text">
+                                    <strong>Количество:</strong> {{ item.quantity }}<br>
+                                    <strong>Цена за единицу:</strong> {{ item.price_at_time }} руб.<br>
+                                    <strong>Сумма:</strong> {{ item.get_total_price }} руб.
+                                </p>
+                                {% if not review_exists %}
+                                    <a href="{% url 'shop:product_detail' item.product.id %}" class="btn btn-outline-primary btn-sm">
+                                        Оставить отзыв
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Итого</h5>
+                    <p class="card-text">
+                        <strong>Количество товаров:</strong> {{ order.orderitem_set.count }}<br>
+                        {% if order.promo %}
+                            <strong>Скидка:</strong> {{ order.promo.discount_percent }}%<br>
+                        {% endif %}
+                        <strong>Итоговая сумма:</strong> {{ order.total_amount }} руб.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

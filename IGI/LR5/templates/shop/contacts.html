@@ -1,0 +1,103 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Контакты - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Контакты</h1>
+    
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">Как нас найти</h2>
+                    <p><i class="fas fa-map-marker-alt me-2"></i>улицп пушкина дом калатушкина</p>
+                    <p><i class="fas fa-phone me-2"></i>+333333333</p>
+                    <p><i class="fas fa-envelope me-2"></i>superbaker@gmail.com</p>
+                    
+                    <h3 class="h5 mt-4 mb-3">Время работы:</h3>
+                    <p class="mb-1">Понедельник - Пятница: 8:00 - 20:00</p>
+                    <p class="mb-1">Суббота - Воскресенье: 9:00 - 19:00</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">Социальные сети</h2>
+                    <div class="d-flex gap-3 mb-4">
+                        <a href="#" class="text-decoration-none fs-3">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-decoration-none fs-3">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-decoration-none fs-3">
+                            <i class="fab fa-vk"></i>
+                        </a>
+                    </div>
+                    
+                    <h3 class="h5 mt-4 mb-3">Мессенджеры:</h3>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-decoration-none fs-3">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="#" class="text-decoration-none fs-3">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                        <a href="#" class="text-decoration-none fs-3">
+                            <i class="fab fa-viber"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="h3 mb-4">Наши специалисты</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        {% for employee in employees %}
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h3 class="h5 card-title">{{ employee.user.get_full_name }}</h3>
+                    <h4 class="h6 text-muted mb-3">{{ employee.position }}</h4>
+                    <p class="card-text">{{ employee.bio }}</p>
+                    <p class="card-text mb-0">
+                        <small class="text-muted">
+                            <i class="fas fa-phone me-2"></i>{{ employee.phone_number }}
+                        </small>
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-envelope me-2"></i>{{ employee.user.email }}
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="h4 mb-3">Напишите нам</h2>
+            <form>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Ваше имя</label>
+                    <input type="text" class="form-control" id="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Сообщение</label>
+                    <textarea class="form-control" id="message" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Отправить</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

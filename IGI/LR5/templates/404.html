@@ -1,0 +1,40 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}404 - Страница не найдена{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="error-template">
+                <i class="fas fa-exclamation-circle fa-5x text-danger mb-4"></i>
+                <h1 class="display-4">Ошибка 404</h1>
+                <h2 class="mb-4">Страница не найдена</h2>
+                <div class="error-details mb-4">
+                    К сожалению, запрашиваемая страница не существует или находится в разработке.
+                </div>
+                <div class="error-actions">
+                    <a href="{% url 'shop:home' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-home me-2"></i>На главную
+                    </a>
+                    {% if request.user.is_authenticated and request.user.role == 'employee' %}
+                    <a href="{% url 'shop:employee_dashboard' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-tachometer-alt me-2"></i>Панель управления
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.error-template {
+    padding: 40px 15px;
+}
+.error-actions {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,173 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}{% if product %}Редактирование{% else %}Добавление{% endif %} товара - Sweet Dreams{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{% if product %}Редактирование{% else %}Добавление{% endif %} товара</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'shop:admin_product_list' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>К списку товаров
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Название товара</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ product.name|default:'' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Описание</label>
+                            <textarea class="form-control" id="description" name="description" rows="5">{{ product.description|default:'' }}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Категория</label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="">Выберите категорию</option>
+                                        {% for cat in categories %}
+                                        <option value="{{ cat.id }}" {% if product.category_id == cat.id %}selected{% endif %}>
+                                            {{ cat.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="manufacturer" class="form-label">Производитель</label>
+                                    <select class="form-select" id="manufacturer" name="manufacturer" required>
+                                        <option value="">Выберите производителя</option>
+                                        {% for man in manufacturers %}
+                                        <option value="{{ man.id }}" {% if product.manufacturer_id == man.id %}selected{% endif %}>
+                                            {{ man.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Цена</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="price" name="price" value="{{ product.price|default:'' }}" min="0" step="0.01" required>
+                                        <span class="input-group-text">₽</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="weight" class="form-label">Вес</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="weight" name="weight" value="{{ product.weight|default:'' }}" min="0" step="0.01">
+                                        <span class="input-group-text">г</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="calories" class="form-label">Калории</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="calories" name="calories" value="{{ product.calories|default:'' }}" min="0">
+                                        <span class="input-group-text">ккал</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Фото товара</label>
+                            {% if product and product.image %}
+                            <div class="mb-2">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="available" name="available" {% if product.available %}checked{% endif %}>
+                                <label class="form-check-label" for="available">Товар в наличии</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="featured" name="featured" {% if product.featured %}checked{% endif %}>
+                                <label class="form-check-label" for="featured">Рекомендуемый товар</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <label class="form-label">Состав и пищевая ценность</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="ingredients" class="form-label">Состав</label>
+                                <textarea class="form-control" id="ingredients" name="ingredients" rows="3">{{ product.ingredients|default:'' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="proteins" class="form-label">Белки</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="proteins" name="proteins" value="{{ product.proteins|default:'' }}" min="0" step="0.1">
+                                            <span class="input-group-text">г</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="fats" class="form-label">Жиры</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="fats" name="fats" value="{{ product.fats|default:'' }}" min="0" step="0.1">
+                                            <span class="input-group-text">г</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="carbohydrates" class="form-label">Углеводы</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="carbohydrates" name="carbohydrates" value="{{ product.carbohydrates|default:'' }}" min="0" step="0.1">
+                                            <span class="input-group-text">г</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="shelf_life" class="form-label">Срок годности</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="shelf_life" name="shelf_life" value="{{ product.shelf_life|default:'' }}" min="1">
+                                            <span class="input-group-text">дней</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Сохранить
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

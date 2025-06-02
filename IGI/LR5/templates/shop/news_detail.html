@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ news.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:news_list' %}">Новости</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ news.title }}</li>
+        </ol>
+    </nav>
+
+    <article class="news-article">
+        <h1 class="mb-3">{{ news.title }}</h1>
+        <p class="text-muted">{{ news.created_at|date:"d.m.Y H:i" }}</p>
+        
+        {% if news.image %}
+        <div class="news-image mb-4">
+            <img src="{{ news.image.url }}" class="img-fluid rounded" alt="{{ news.title }}">
+        </div>
+        {% endif %}
+        
+        <div class="news-content">
+            {{ news.content|linebreaks }}
+        </div>
+    </article>
+
+    <div class="mt-4">
+        <a href="{% url 'shop:news_list' %}" class="btn btn-outline-primary">← Вернуться к списку новостей</a>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,44 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Оформление заказа - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                    <h2 class="card-title mb-4">Заказ успешно оформлен!</h2>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-truck me-2"></i>
+                        Доставка будет осуществлена завтра
+                    </div>
+
+                    <div class="order-details mt-4">
+                        <h4>Детали заказа:</h4>
+                        <p><strong>Сумма заказа:</strong> {{ cart.get_total_price }} ₽</p>
+                        {% if cart.get_promo_discount %}
+                            <p>
+                                <strong>Промокод:</strong> {{ cart.promo_code }}
+                                (скидка {{ cart.get_promo_discount.discount_percent }}%)
+                            </p>
+                            <p><strong>Итого со скидкой:</strong> {{ cart.get_promo_discount.final_price }} ₽</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="{% url 'shop:home' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-home me-2"></i>На главную
+                        </a>
+                        <a href="{% url 'shop:order_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-list me-2"></i>Мои заказы
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

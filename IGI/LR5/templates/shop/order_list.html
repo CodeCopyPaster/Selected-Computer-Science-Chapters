@@ -1,0 +1,45 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Мои заказы - Кондитерская{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Мои заказы</h1>
+
+    {% if orders %}
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Заказ #{{ order.id }}</h5>
+                            <p class="card-text">
+                                <strong>Дата заказа:</strong> {{ order.order_date|date:"d.m.Y H:i" }}<br>
+                                <strong>Статус:</strong> {{ order.get_status_display }}<br>
+                                <strong>Сумма:</strong> {{ order.total_amount }} руб.
+                            </p>
+                            {% if order.delivery_date %}
+                                <p class="card-text">
+                                    <strong>Дата доставки:</strong> {{ order.delivery_date|date:"d.m.Y H:i" }}
+                                </p>
+                            {% endif %}
+                            {% if order.pickup_point %}
+                                <p class="card-text">
+                                    <strong>Пункт выдачи:</strong> {{ order.pickup_point.address }}
+                                </p>
+                            {% endif %}
+                            <a href="{% url 'shop:order_detail' order.pk %}" class="btn btn-primary">
+                                Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>У вас пока нет заказов. <a href="{% url 'shop:product_list' %}">Перейти в каталог</a></p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
